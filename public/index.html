@@ -1,111 +1,985 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <title>Ajnabee</title>
+  <title>Solmegle - Where Degens come to meet Degens!</title>
   <link rel="icon" href="img/favicon.png" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#c0c0c0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link href="css/style.css" rel="stylesheet" />
-  <link href="css/landing.css" rel="stylesheet" />
-  <link href="css/landing-phone.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=MS+Sans+Serif:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="favicon/site.webmanifest">
   <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
-  <meta name="favicon/msapplication-TileColor" content="#da532c">
-  <meta name="favicon/theme-color" content="#333333">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#c0c0c0">
+  
+  <!-- Chart.js for creating charts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=MS+Sans+Serif:wght@400;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'MS Sans Serif', sans-serif;
+      background: linear-gradient(135deg, #008080 0%, #20b2aa 100%);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* Desktop Background */
+    .desktop {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="%23008080"/><rect x="0" y="0" width="1" height="1" fill="%23ffffff" opacity="0.1"/></svg>') repeat;
+    }
+
+    /* Taskbar */
+    .taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%);
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      z-index: 1000;
+    }
+
+    .start-button {
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%);
+      border: 2px outset #c0c0c0;
+      color: black;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .start-button:active {
+      border: 2px inset #c0c0c0;
+    }
+
+    .start-icon {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(45deg, #ff0000, #ffff00, #00ff00, #0000ff);
+      border-radius: 2px;
+    }
+
+    .time {
+      margin-left: auto;
+      color: black;
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px inset #c0c0c0;
+    }
+
+    .online-count {
+      color: #000080;
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px inset #c0c0c0;
+      margin-right: 8px;
+    }
+
+    /* Loading Animation Container */
+    .loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #008080 0%, #20b2aa 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeOut 1s ease-in-out 4s forwards;
+    }
+
+    /* 3D Rotating Cube Animation */
+    .cube-container {
+      perspective: 1000px;
+      margin-bottom: 40px;
+    }
+
+    .cube {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotateCube 3s infinite linear;
+    }
+
+    .cube-face {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border: 2px solid #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .cube-face.front { transform: rotateY(0deg) translateZ(50px); }
+    .cube-face.back { transform: rotateY(180deg) translateZ(50px); }
+    .cube-face.right { transform: rotateY(90deg) translateZ(50px); }
+    .cube-face.left { transform: rotateY(-90deg) translateZ(50px); }
+    .cube-face.top { transform: rotateX(90deg) translateZ(50px); }
+    .cube-face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+    @keyframes rotateCube {
+      0% { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg); }
+    }
+
+    .logo {
+      font-size: 4rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .tagline {
+      font-size: 1.5rem;
+      color: #e0e0e0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      text-align: center;
+      max-width: 600px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    /* Video Call Modal */
+    .video-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 1200px;
+      height: 80vh;
+      background: #c0c0c0;
+      border: 2px outset #c0c0c0;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      animation: slideIn 1s ease-out 5s forwards;
+      z-index: 1500;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+      }
+      to {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .modal-header {
+      background: linear-gradient(to right, #000080, #0000ff);
+      color: white;
+      padding: 2px;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      padding: 2px 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .modal-controls {
+      display: flex;
+      gap: 2px;
+    }
+
+    .control-btn {
+      width: 16px;
+      height: 14px;
+      background: #c0c0c0;
+      border: 1px outset #c0c0c0;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-btn:active {
+      border: 1px inset #c0c0c0;
+    }
+
+    .modal-content {
+      display: flex;
+      height: calc(100% - 20px);
+      background: #c0c0c0;
+    }
+
+    .video-section {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .video-container {
+      flex: 1;
+      background: #000;
+      border: 2px inset #c0c0c0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-player {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #333;
+    }
+
+    .mirror {
+      transform: scaleX(-1);
+    }
+
+    #video-peer {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #333;
+    }
+
+    #video-self {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 150px;
+      height: 100px;
+      border: 1px solid #fff;
+      background: #333;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    #peer-video-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 4px solid #ffffff40;
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    #watermark {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      width: 30px;
+      height: 30px;
+      opacity: 0.7;
+      filter: invert(1);
+    }
+
+    .video-controls {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: #c0c0c0;
+      border: 1px inset #c0c0c0;
+    }
+
+    .video-btn {
+      padding: 4px 12px;
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%);
+      border: 1px outset #c0c0c0;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+      color: black;
+    }
+
+    .video-btn:active {
+      border: 1px inset #c0c0c0;
+    }
+
+    .video-btn:disabled {
+      color: #808080;
+      cursor: not-allowed;
+    }
+
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-left: 2px inset #c0c0c0;
+    }
+
+    .chat-header {
+      background: #c0c0c0;
+      padding: 4px 8px;
+      border-bottom: 1px inset #c0c0c0;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    #message-area {
+      flex: 1;
+      background: white;
+      border: 1px inset #c0c0c0;
+      margin: 4px;
+      padding: 8px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .message {
+      margin-bottom: 8px;
+    }
+
+    .message-status {
+      color: #666;
+      font-weight: bold;
+      text-align: center;
+      margin: 8px 0 16px 0;
+    }
+
+    .message .you {
+      color: #000080;
+      font-weight: bold;
+    }
+
+    .message .strange {
+      color: #008000;
+      font-weight: bold;
+    }
+
+    .chat-input-container {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: #c0c0c0;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 2px 4px;
+      border: 1px inset #c0c0c0;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+    }
+
+    #send-btn, #skip-btn {
+      padding: 2px 8px;
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%);
+      border: 1px outset #c0c0c0;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+      color: black;
+    }
+
+    #send-btn:active, #skip-btn:active {
+      border: 1px inset #c0c0c0;
+    }
+
+    #send-btn:disabled, #skip-btn:disabled {
+      color: #808080;
+      cursor: not-allowed;
+    }
+
+    #typing {
+      color: #666;
+      font-style: italic;
+      padding: 4px 8px;
+      font-size: 11px;
+      display: none;
+    }
+
+    /* Hidden original container */
+    #videos {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+
+    #input-area {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .video-modal {
+        width: 95vw;
+        height: 90vh;
+      }
+      
+      .modal-content {
+        flex-direction: column;
+      }
+      
+      .video-section {
+        flex: 2;
+      }
+      
+      .chat-section {
+        flex: 1;
+        border-left: none;
+        border-top: 2px inset #c0c0c0;
+      }
+      
+      #video-self {
+        width: 100px;
+        height: 75px;
+      }
+
+      .logo {
+        font-size: 3rem;
+      }
+
+      .tagline {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Feedback Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content-feedback {
+      background-color: #c0c0c0;
+      margin: 15% auto;
+      padding: 0;
+      border: 2px outset #c0c0c0;
+      width: 400px;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .feedback-header {
+      background: linear-gradient(to right, #000080, #0000ff);
+      color: white;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .close:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .feedback-content {
+      padding: 12px;
+    }
+
+    #feedbackText {
+      width: 100%;
+      height: 100px;
+      padding: 4px;
+      border: 1px inset #c0c0c0;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    #submit-btn {
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%);
+      border: 1px outset #c0c0c0;
+      font-family: 'MS Sans Serif', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    #submit-btn:active {
+      border: 1px inset #c0c0c0;
+    }
+
+    /* Chart styles */
+    #chart-btn {
+      background-color: #2fcd8c;
+      color: black;
+      margin-right: 10px;
+    }
+
+    /* Include all your existing chart styles here... */
+    #chartModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    #chartModal .modal-content {
+      background-color: #1a1e27;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #3a3f4b;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 8px;
+      color: white;
+    }
+
+    /* All your existing chart styles go here... */
+  </style>
 </head>
-
 <body>
-  <div id="main">
-    <!-- top bar -->
-    <div id="top-bar">
-      <div id="logo">
-        <img width="20px" src="/assets/logo.svg" alt="Ajnabee" />
+  <!-- Original elements (hidden) -->
+  <div id="main" style="display: none;">
+    <div id="videos">
+      <div id="peer">
+        <video class="video-player mirror" id="video-peer" autoplay playsinline></video>
+        <div id="peer-video-loader"></div>
+        <img src="/assets/logo.svg" alt="solmegle" id="watermark">
       </div>
-      <div id="top-right">
-        <div id="peopleOnline">
-          <p><span>0</span>+ online now</p>
-        </div>
-        <button id="feedback-btn" class="button">Provide Feedback</button>
-      </div>
-    </div>
-
-    <!-- main content -->
-    <div id="content">
-      <!-- social message -->
-      <div id="social-message">
-
-        <div id="message-content">
-          <p id="help-text"> Help Manipur save its people from conflict that is currently happening.
-            <br>
-            <br>
-            A total of 53,000 people have been displaced due to the ongoing conflict and more that 200 people have been
-            killed.
-            These are just reported figures with the real figures being much higher.
-
-            We stand with the people of Manipur, donate here to help bring peace again to the region.
-          </p>
-          <a href="https://www.gofundme.com/f/humanitarian-aid-to-victims-of-manipur-violence"> Help Manipur </a>
-        </div>
-
-        <img id="message-image" src="./assets/peace.webp"></img>
-
-      </div>
-
-      <!-- instructions -->
-      <div id="instructions">
-        <p>Video is being monitored. Keep it clean.</p>
-      </div>
-
-      <div id="options-container">
-        <!-- interests -->
-        <div id="interest-container">
-          <p>What do you wanna talk about?</p>
-          <input type="text" id="interests" placeholder="Add your interests (optional)" />
-          <div id="tag-container"></div>
-        </div>
-
-        <!-- chat options -->
-        <div id="chat-options">
-          <p>Start chatting</p>
-          <div id="button-container">
-            <button class="button"id="text-btn">Text</button>
-            <p>or</p>
-            <button class="button" id="video-btn">Video</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="footer">
-        <p>&#169;Ajnabee 2023</p>
-        <a href="mailto://contact@ajnabee.live">Contact us</a>
+      <div id="self">
+        <video class="video-player mirror" id="video-self" autoplay playsinline muted="muted"></video>
       </div>
     </div>
-    <div id="disclaimer">
-      <p>By using the Ajnabee website, and/or related products and/or services (<b>Ajnabee</b>), you agree to the following terms. Do not use Ajnabee if you are under 18 years old. Do not transmit nudity, sexually harass anyone, publicize other people's private information, make statements that defame or libel anyone, violate intellectual property rights, use automated programs to start chats, or behave in any other inappropriate or illegal way on Ajnabee. Do not behave inappropriately on Ajnabee, and understand that human behavior is fundamentally uncontrollable. The people you encounter on Ajnabee may not behave appropriately, and they are solely responsible for their own behavior. Use Ajnabee at your own peril. Disconnect if anyone makes you feel uncomfortable. You may be denied access to Ajnabee for inappropriate behavior or for any other reason. AJNABEE IS PROVIDED AS IS AND TO THE MAXIMUM EXTENT ALLOWED BY APPLICABLE LAW. IT IS PROVIDED WITHOUT ANY WARRANTY, EXPRESS OR IMPLIED, NOT EVEN A WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE TO THE MAXIMUM EXTENT ALLOWED BY APPLICABLE LAW. THE PROVIDER OF AJNABEE AND ANY OTHER PERSON OR ENTITY ASSOCIATED WITH AJNABEE'S OPERATION SHALL NOT BE HELD LIABLE FOR ANY DIRECT DAMAGES ARISING FROM THE USE OF AJNABEE, OR ANY OTHER DAMAGES RELATED TO AJNABEE OF ANY KIND WHATSOEVER. By using Ajnabee, you accept the practices outlined in Ajnabee's Privacy Policy and information about cookies.</p>
+
+    <div id="message-area">
+      <div id="messages"></div>
+      <div id="typing" style="display: none" class="message">Stranger is typing...</div>
+    </div>
+
+    <div id="input-area">
+      <button class="button" id="skip-btn">Skip<span>Esc</span></button>
+      <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" />
+      <button class="button" id="send-btn">Send<span>Enter</span></button>
     </div>
   </div>
 
-  <!-- feedback popup -->
+  <!-- Desktop Background -->
+  <div class="desktop">
+    <!-- Taskbar -->
+    <div class="taskbar">
+      <div class="start-button">
+        <div class="start-icon"></div>
+        Start
+      </div>
+      <div class="online-count" id="peopleOnline">
+        <span>0</span>+ degens online
+      </div>
+      <div class="time" id="time"></div>
+    </div>
+  </div>
+
+  <!-- Loading Animation -->
+  <div class="loading-container" id="loadingContainer">
+    <div class="cube-container">
+      <div class="cube">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+      </div>
+    </div>
+    <div class="logo">Solmegle</div>
+    <div class="tagline">meet the degens behind the trade</div>
+  </div>
+
+  <!-- Video Call Modal -->
+  <div class="video-modal" id="videoModal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span>📹</span>
+        Solmegle - Video Chat
+      </div>
+      <div class="modal-controls">
+        <div class="control-btn">_</div>
+        <div class="control-btn">□</div>
+        <div class="control-btn" onclick="window.location.reload()">×</div>
+      </div>
+    </div>
+    <div class="modal-content">
+      <div class="video-section">
+        <div class="video-container">
+          <!-- Video elements will be moved here -->
+        </div>
+        <div class="video-controls">
+          <button class="video-btn" id="skip-btn-new">Skip (Esc)</button>
+          <button class="video-btn" id="chart-btn">📈 Charts</button>
+          <button class="video-btn" onclick="toggleMute()">🔊 Audio</button>
+          <button class="video-btn" onclick="toggleVideo()">📹 Video</button>
+        </div>
+      </div>
+      <div class="chat-section">
+        <div class="chat-header">Chat Messages</div>
+        <div id="message-area-new">
+          <!-- Messages will be moved here -->
+        </div>
+        <div id="typing-new" style="display: none">Stranger is typing...</div>
+        <div class="chat-input-container">
+          <button id="skip-btn2" class="video-btn" style="margin-right: 4px;">Skip</button>
+          <input type="text" id="message-input-new" placeholder="Type a message..." autocomplete="off" disabled>
+          <button id="send-btn-new" disabled>Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
   <div id="feedbackModal" class="modal">
+    <div class="modal-content-feedback">
+      <div class="feedback-header">
+        <span>Provide Feedback</span>
+        <span class="close">&times;</span>
+      </div>
+      <div class="feedback-content">
+        <form id="feedbackForm">
+          <textarea id="feedbackText" placeholder="Your feedback..." required></textarea>
+          <input type="submit" id="submit-btn" value="Submit" />
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Modal (your existing chart modal code) -->
+  <div id="chartModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2>Provide Feedback</h2>
-      <form id="feedbackForm">
-        <textarea id="feedbackText" rows="10" placeholder="Your feedback..." required></textarea>
-        <input type="submit" class="button" id="submit-btn" value="Submit" />
-      </form>
+      <h2>Memecoin Charts</h2>
+      <p>Chart functionality will be integrated here...</p>
     </div>
   </div>
 
   <script defer src="./js/main.js"></script>
-  <script defer src="./js/landing.js" type="module"></script>
-</body>
+  <script defer src="./js/video.js" type="module"></script>
+  
+  <script>
+    // Update time in taskbar
+    function updateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      document.getElementById('time').textContent = timeString;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
 
+    // Auto-start video call after loading animation
+    setTimeout(() => {
+      startVideoCall();
+    }, 5000);
+
+    function startVideoCall() {
+      // Move video elements to the modal
+      const videoContainer = document.querySelector('.video-container');
+      const originalPeer = document.getElementById('peer');
+      const originalSelf = document.getElementById('self');
+      
+      if (originalPeer && originalSelf && videoContainer) {
+        // Clone and move video elements
+        const newPeer = originalPeer.cloneNode(true);
+        const newSelf = originalSelf.cloneNode(true);
+        
+        videoContainer.appendChild(newPeer);
+        videoContainer.appendChild(newSelf);
+        
+        // Update IDs to avoid conflicts
+        newPeer.id = 'peer-new';
+        newSelf.id = 'self-new';
+        
+        const newPeerVideo = newPeer.querySelector('#video-peer');
+        const newSelfVideo = newSelf.querySelector('#video-self');
+        const newLoader = newPeer.querySelector('#peer-video-loader');
+        const newWatermark = newPeer.querySelector('#watermark');
+        
+        if (newPeerVideo) newPeerVideo.id = 'video-peer-new';
+        if (newSelfVideo) newSelfVideo.id = 'video-self-new';
+        if (newLoader) newLoader.id = 'peer-video-loader-new';
+        if (newWatermark) newWatermark.id = 'watermark-new';
+      }
+
+      // Move message area
+      const newMessageArea = document.getElementById('message-area-new');
+      const originalMessages = document.getElementById('messages');
+      if (originalMessages && newMessageArea) {
+        const newMessages = originalMessages.cloneNode(true);
+        newMessages.id = 'messages-new';
+        newMessageArea.appendChild(newMessages);
+      }
+
+      // Set up event listeners for new elements
+      const skipBtnNew = document.getElementById('skip-btn-new');
+      const skipBtn2 = document.getElementById('skip-btn2');
+      const sendBtnNew = document.getElementById('send-btn-new');
+      const inputNew = document.getElementById('message-input-new');
+      
+      // Get original elements
+      const originalSkipBtn = document.getElementById('skip-btn');
+      const originalSendBtn = document.getElementById('send-btn');
+      const originalInput = document.getElementById('message-input');
+
+      // Sync skip functionality
+      if (skipBtnNew && originalSkipBtn) {
+        skipBtnNew.addEventListener('click', () => originalSkipBtn.click());
+      }
+      if (skipBtn2 && originalSkipBtn) {
+        skipBtn2.addEventListener('click', () => originalSkipBtn.click());
+      }
+
+      // Sync send functionality
+      if (sendBtnNew && originalSendBtn && inputNew && originalInput) {
+        sendBtnNew.addEventListener('click', () => {
+          originalInput.value = inputNew.value;
+          originalSendBtn.click();
+          inputNew.value = '';
+        });
+
+        inputNew.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            sendBtnNew.click();
+          }
+          // Sync typing to original input
+          originalInput.value = inputNew.value;
+          originalInput.dispatchEvent(new KeyboardEvent('keydown', { key: e.key }));
+        });
+
+        inputNew.addEventListener('keyup', (e) => {
+          originalInput.value = inputNew.value;
+          originalInput.dispatchEvent(new KeyboardEvent('keyup', { key: e.key }));
+        });
+      }
+
+      // Sync message updates
+      const originalMessagesEl = document.getElementById('messages');
+      const newMessagesEl = document.getElementById('messages-new');
+      if (originalMessagesEl && newMessagesEl) {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+              // Copy new messages to the modal
+              newMessagesEl.innerHTML = originalMessagesEl.innerHTML;
+              newMessagesEl.scrollTop = newMessagesEl.scrollHeight;
+            }
+          });
+        });
+        observer.observe(originalMessagesEl, { childList: true, subtree: true });
+      }
+
+      // Sync typing indicator
+      const originalTyping = document.getElementById('typing');
+      const newTyping = document.getElementById('typing-new');
+      if (originalTyping && newTyping) {
+        const typingObserver = new MutationObserver(() => {
+          newTyping.style.display = originalTyping.style.display;
+          newTyping.textContent = originalTyping.textContent;
+        });
+        typingObserver.observe(originalTyping, { attributes: true, attributeFilter: ['style'] });
+      }
+
+      // Sync input states
+      if (originalInput && inputNew && originalSendBtn && sendBtnNew) {
+        const inputObserver = new MutationObserver(() => {
+          inputNew.disabled = originalInput.readOnly;
+          sendBtnNew.disabled = originalSendBtn.disabled;
+        });
+        inputObserver.observe(originalInput, { attributes: true, attributeFilter: ['readonly'] });
+        inputObserver.observe(originalSendBtn, { attributes: true, attributeFilter: ['disabled'] });
+      }
+
+      // Sync video streams
+      const originalPeerVideo = document.getElementById('video-peer');
+      const originalSelfVideo = document.getElementById('video-self');
+      const newPeerVideo = document.getElementById('video-peer-new');
+      const newSelfVideo = document.getElementById('video-self-new');
+
+      // Sync peer video stream
+      if (originalPeerVideo && newPeerVideo) {
+        const syncPeerVideo = () => {
+          if (originalPeerVideo.srcObject !== newPeerVideo.srcObject) {
+            newPeerVideo.srcObject = originalPeerVideo.srcObject;
+          }
+        };
+        
+        originalPeerVideo.addEventListener('loadedmetadata', syncPeerVideo);
+        const peerVideoObserver = new MutationObserver(syncPeerVideo);
+        peerVideoObserver.observe(originalPeerVideo, { attributes: true, attributeFilter: ['src'] });
+        
+        // Initial sync
+        syncPeerVideo();
+      }
+
+      // Sync self video stream
+      if (originalSelfVideo && newSelfVideo) {
+        const syncSelfVideo = () => {
+          if (originalSelfVideo.srcObject !== newSelfVideo.srcObject) {
+            newSelfVideo.srcObject = originalSelfVideo.srcObject;
+          }
+        };
+        
+        originalSelfVideo.addEventListener('loadedmetadata', syncSelfVideo);
+        const selfVideoObserver = new MutationObserver(syncSelfVideo);
+        selfVideoObserver.observe(originalSelfVideo, { attributes: true, attributeFilter: ['src'] });
+        
+        // Initial sync
+        syncSelfVideo();
+      }
+
+      // Sync video loader
+      const originalLoader = document.getElementById('peer-video-loader');
+      const newLoader = document.getElementById('peer-video-loader-new');
+      if (originalLoader && newLoader) {
+        const loaderObserver = new MutationObserver(() => {
+          newLoader.style.display = originalLoader.style.display;
+        });
+        loaderObserver.observe(originalLoader, { attributes: true, attributeFilter: ['style'] });
+      }
+
+      // Sync online count
+      const originalPeopleOnline = document.querySelector('#peopleOnline span');
+      const newPeopleOnline = document.querySelector('.online-count span');
+      if (originalPeopleOnline && newPeopleOnline) {
+        const onlineObserver = new MutationObserver(() => {
+          newPeopleOnline.textContent = originalPeopleOnline.textContent;
+        });
+        onlineObserver.observe(originalPeopleOnline, { childList: true, subtree: true });
+      }
+    }
+
+    // Audio/Video controls
+    window.toggleMute = function() {
+      // Find existing mute button and click it
+      const existingMuteBtn = document.getElementById('mic-toggle-btn');
+      if (existingMuteBtn) {
+        existingMuteBtn.click();
+      }
+    }
+
+    window.toggleVideo = function() {
+      // Find existing video button and click it
+      const existingVideoBtn = document.getElementById('camera-toggle-btn');
+      if (existingVideoBtn) {
+        existingVideoBtn.click();
+      }
+    }
+
+    // Chart button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const chartBtn = document.getElementById('chart-btn');
+        const chartModal = document.getElementById('chartModal');
+        
+        if (chartBtn && chartModal) {
+          chartBtn.addEventListener('click', () => {
+            chartModal.style.display = 'block';
+          });
+        }
+
+        // Close chart modal
+        const chartClose = chartModal?.querySelector('.close');
+        if (chartClose) {
+          chartClose.addEventListener('click', () => {
+            chartModal.style.display = 'none';
+          });
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+          if (e.target === chartModal) {
+            chartModal.style.display = 'none';
+          }
+        });
+      }, 6000); // Wait for everything to load
+    });
+
+    // Handle escape key for skipping
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const skipBtn = document.getElementById('skip-btn');
+        if (skipBtn) {
+          skipBtn.click();
+        }
+      }
+    });
+  </script>
+</body>
 </html>
