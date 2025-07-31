@@ -2,12 +2,13 @@
 <html lang="en">
 
 <head>
-  <title>Ajnabee</title>
+  <title>Solmegle</title>
   <link rel="icon" href="img/favicon.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=MS+Sans+Serif:wght@400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/phone.css" rel="stylesheet" />
@@ -18,20 +19,381 @@
   <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
   <meta name="favicon/msapplication-TileColor" content="#da532c">
   <meta name="favicon/theme-color" content="#333333">
+  
+  <!-- Chart.js for creating charts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=MS+Sans+Serif:wght@400;700&display=swap');
+    
+    /* Windows 98 Theme Overrides - AFTER original CSS loads */
+    body {
+      font-family: 'MS Sans Serif', sans-serif !important;
+      background: #c0c0c0 !important;
+    }
+
+    /* Desktop wallpaper pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" fill="%23c0c0c0"/><rect x="0" y="0" width="1" height="1" fill="%23ffffff" opacity="0.1"/></svg>') repeat;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Main container Windows 98 style */
+    #main {
+      background: #c0c0c0 !important;
+      border: 2px outset #c0c0c0 !important;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.3) !important;
+      margin: 20px !important;
+      height: calc(100vh - 40px) !important;
+    }
+
+    /* Top bar Windows 98 style */
+    #top-bar {
+      background: linear-gradient(to right, #000080, #0000ff) !important;
+      color: white !important;
+      border: none !important;
+      padding: 2px 6px !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    #top-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 6px;
+      width: 16px;
+      height: 14px;
+      background: #c0c0c0;
+      border: 1px outset #c0c0c0;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Logo in title bar */
+    #logo {
+      color: white !important;
+      font-weight: bold !important;
+    }
+
+    #logo img {
+      filter: invert(1) !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+
+    /* People online in title bar */
+    #peopleOnline {
+      background: none !important;
+      border: none !important;
+      color: white !important;
+      font-size: 11px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    #peopleOnline p {
+      margin: 0 !important;
+      color: white !important;
+      font-size: 11px !important;
+    }
+
+    #peopleOnline p::before {
+      display: none !important;
+    }
+
+    #feedback-btn {
+      background: #c0c0c0 !important;
+      border: 1px outset #c0c0c0 !important;
+      color: black !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 10px !important;
+      padding: 2px 4px !important;
+    }
+
+    #feedback-btn:active {
+      border: 1px inset #c0c0c0 !important;
+    }
+
+    /* Video container Windows 98 style */
+    #videos {
+      background: #c0c0c0 !important;
+      border: none !important;
+      padding: 8px !important;
+      display: grid !important;
+      grid-template-rows: 1fr 1fr !important;
+      gap: 8px !important;
+      height: calc(100% - 140px) !important;
+    }
+
+    #peer, #self {
+      border: 2px inset #c0c0c0 !important;
+      background: #000 !important;
+      overflow: hidden !important;
+    }
+
+    #peer {
+      position: relative !important;
+    }
+
+    #self {
+      position: relative !important;
+    }
+
+    .video-player {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      background: #000 !important;
+    }
+
+    #watermark {
+      position: absolute !important;
+      bottom: 10px !important;
+      left: 10px !important;
+      width: 24px !important;
+      height: 24px !important;
+      opacity: 0.7 !important;
+      filter: invert(1) !important;
+    }
+
+    #peer-video-loader {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 40px !important;
+      height: 40px !important;
+      border: 4px solid #ffffff40 !important;
+      border-top: 4px solid #ffffff !important;
+      border-radius: 50% !important;
+      animation: spin 1s linear infinite !important;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Message area Windows 98 style */
+    #message-area {
+      background: white !important;
+      border: 2px inset #c0c0c0 !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+      margin: 8px !important;
+      padding: 4px !important;
+      height: 80px !important;
+      overflow-y: auto !important;
+    }
+
+    .message {
+      margin: 2px 0 !important;
+      font-size: 11px !important;
+    }
+
+    .message-status {
+      color: #666 !important;
+      font-weight: bold !important;
+      text-align: center !important;
+      font-size: 11px !important;
+    }
+
+    .message .you {
+      color: #000080 !important;
+      font-weight: bold !important;
+    }
+
+    .message .strange {
+      color: #008000 !important;
+      font-weight: bold !important;
+    }
+
+    #typing {
+      color: #666 !important;
+      font-style: italic !important;
+      font-size: 10px !important;
+      margin: 2px 4px !important;
+    }
+
+    /* Input area Windows 98 style */
+    #input-area {
+      background: #c0c0c0 !important;
+      border: none !important;
+      padding: 8px !important;
+      display: flex !important;
+      gap: 4px !important;
+      align-items: center !important;
+    }
+
+    #message-input {
+      flex: 1 !important;
+      border: 2px inset #c0c0c0 !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+      background: white !important;
+      padding: 2px 4px !important;
+      color: black !important;
+    }
+
+    .button, #skip-btn, #send-btn {
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%) !important;
+      border: 2px outset #c0c0c0 !important;
+      color: black !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+      padding: 4px 8px !important;
+      cursor: pointer !important;
+    }
+
+    .button:active, #skip-btn:active, #send-btn:active {
+      border: 2px inset #c0c0c0 !important;
+    }
+
+    .button:disabled, #skip-btn:disabled, #send-btn:disabled {
+      color: #808080 !important;
+      cursor: not-allowed !important;
+    }
+
+    .button span {
+      font-size: 9px !important;
+      display: block !important;
+    }
+
+    /* Chart button */
+    #chart-btn {
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%) !important;
+      border: 2px outset #c0c0c0 !important;
+      color: black !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+    }
+
+    #chart-btn:active {
+      border: 2px inset #c0c0c0 !important;
+    }
+
+    /* Modals Windows 98 style */
+    .modal-content {
+      background: #c0c0c0 !important;
+      border: 2px outset #c0c0c0 !important;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.3) !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+    }
+
+    /* Modal title bars */
+    #feedbackModal .modal-content::before,
+    #chartModal .modal-content::before {
+      content: '';
+      display: block;
+      height: 20px;
+      background: linear-gradient(to right, #000080, #0000ff);
+      margin: -20px -20px 10px -20px;
+      position: relative;
+    }
+
+    #feedbackModal h2,
+    #chartModal h2 {
+      position: absolute;
+      top: -30px;
+      left: 6px;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      margin: 0;
+      line-height: 20px;
+    }
+
+    .close {
+      position: absolute !important;
+      top: -30px !important;
+      right: 6px !important;
+      width: 16px !important;
+      height: 14px !important;
+      background: #c0c0c0 !important;
+      border: 1px outset #c0c0c0 !important;
+      color: black !important;
+      font-size: 10px !important;
+      line-height: 12px !important;
+      text-align: center !important;
+      cursor: pointer !important;
+    }
+
+    .close:hover {
+      border: 1px inset #c0c0c0 !important;
+    }
+
+    /* Form elements */
+    #feedbackText {
+      border: 2px inset #c0c0c0 !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+      background: white !important;
+    }
+
+    #submit-btn {
+      background: linear-gradient(to bottom, #c0c0c0 0%, #808080 100%) !important;
+      border: 2px outset #c0c0c0 !important;
+      color: black !important;
+      font-family: 'MS Sans Serif', sans-serif !important;
+      font-size: 11px !important;
+    }
+
+    #submit-btn:active {
+      border: 2px inset #c0c0c0 !important;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      #main {
+        margin: 10px !important;
+        height: calc(100vh - 20px) !important;
+      }
+
+      #videos {
+        grid-template-rows: 2fr 1fr !important;
+      }
+
+      #message-area {
+        height: 60px !important;
+      }
+
+      .button span {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <div id="main">
     <!-- top bar -->
     <div id="top-bar">
-      <div id="logo">
-        <img width=20px src="/assets/logo.svg" alt="Ajnabee">
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <div id="logo">
+          <img width=16px src="/assets/logo.svg" alt="Solmegle">
+        </div>
+        <span>Solmegle - Video Chat</span>
       </div>
       <div id="top-right">
         <div id="peopleOnline">
-          <p><span>0</span>+ online now</p>
+          <p><span>0</span>+ online</p>
         </div>
-        <button id="feedback-btn" class="button">Provide Feedback</button>
+        <button id="feedback-btn" class="button">Help</button>
       </div>
     </div>
 
@@ -40,7 +402,7 @@
       <div id="peer">
         <video class="video-player mirror" id="video-peer" autoplay playsinline></video>
         <div id="peer-video-loader"></div>
-        <img src="/assets/logo.svg" alt="ajnabee" id="watermark">
+        <img src="/assets/logo.svg" alt="solmegle" id="watermark">
       </div>
       <div id="self">
         <video class="video-player mirror" id="video-self" autoplay playsinline muted="muted"></video>
@@ -53,10 +415,10 @@
       <div id="typing" style="display: none" class="message">Stranger is typing...</div>
     </div>
 
-
     <!-- input area -->
     <div id="input-area">
       <button class="button" id="skip-btn">Skip<span>Esc</span></button>
+      <button class="button" id="chart-btn">📈 Charts</button>
       <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" />
       <button class="button" id="send-btn">Send<span>Enter</span></button>
     </div>
@@ -74,8 +436,56 @@
     </div>
   </div>
 
+  <!-- chart popup -->
+  <div id="chartModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Memecoin Charts</h2>
+      <p>Chart functionality will be integrated here...</p>
+    </div>
+  </div>
+
   <script defer src="./js/main.js"></script>
   <script defer src="./js/video.js" type="module"></script>
-</body>
+  
+  <script>
+    // Your existing chart and other functionality from the original video.html
+    // Include all the chart scripts and other JavaScript here...
+    
+    // Direct handler for chart button
+    (function() {
+      // Wait for DOM to be fully loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChartButton);
+      } else {
+        // DOM already loaded, run immediately
+        initChartButton();
+      }
 
+      function initChartButton() {
+        console.log('Initializing chart button handler');
+        const chartBtn = document.getElementById('chart-btn');
+        const chartModal = document.getElementById('chartModal');
+        
+        if (chartBtn && chartModal) {
+          // Replace any existing listeners with a fresh one
+          chartBtn.removeEventListener('click', openChartModal);
+          chartBtn.addEventListener('click', openChartModal);
+          
+          console.log('Chart button handler initialized successfully');
+        } else {
+          console.error('Chart button or modal not found', {
+            buttonExists: !!chartBtn,
+            modalExists: !!chartModal
+          });
+        }
+        
+        function openChartModal() {
+          console.log('Chart button clicked');
+          chartModal.style.display = 'block';
+        }
+      }
+    })();
+  </script>
+</body>
 </html>
